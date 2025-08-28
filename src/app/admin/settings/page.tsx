@@ -1,10 +1,11 @@
 import { db } from '@/db';
 import { siteSettings } from '@/db/schema';
 import { SettingsForm } from '@/components/admin/settings-form';
+import { asc } from 'drizzle-orm';
 
 async function getSettings() {
   try {
-    const settings = await db.select().from(siteSettings).orderBy(siteSettings.id);
+    const settings = await db.select().from(siteSettings).orderBy(asc(siteSettings.id));
     return settings;
   } catch (error) {
     console.error("Failed to fetch site settings:", error);

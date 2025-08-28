@@ -6,7 +6,7 @@ const dbConfig: Config = defineConfig({
   out: './drizzle',
   dialect: 'turso',
   dbCredentials: {
-    url: "file:/app/local.db",
+    url: process.env.TURSO_CONNECTION_URL || "file:./local.db",
     authToken: process.env.TURSO_AUTH_TOKEN,
   },
 });

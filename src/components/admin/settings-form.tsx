@@ -86,7 +86,6 @@ export const SettingsForm = ({ settings: initialSettings }: SettingsFormProps) =
         return (
             <Switch
                 id={`settings.${index}.settingValue`}
-                {...register(`settings.${index}.settingValue`)}
                 checked={JSON.parse(setting.settingValue || 'false')}
                 onCheckedChange={(checked) => {
                     setValue(`settings.${index}.settingValue`, JSON.stringify(checked), { shouldDirty: true });

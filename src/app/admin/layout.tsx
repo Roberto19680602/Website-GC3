@@ -1,9 +1,7 @@
 import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
-import { Bell, Home, LineChart, Package, Package2, ShoppingCart, Users } from 'lucide-react';
+import { Home, Package2, Users, Settings, Navigation, FileText } from 'lucide-react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 
 async function getUser() {
   const cookieStore = await cookies();
@@ -13,8 +11,6 @@ async function getUser() {
     return null;
   }
 
-  // This fetch call runs on the server, so it needs the full URL.
-  // In a real app, this URL should come from an environment variable.
   const res = await fetch('http://localhost:3000/api/auth/me', {
     headers: {
       Cookie: `authToken=${token.value}`,
@@ -42,7 +38,7 @@ export default async function AdminLayout({
   const user = await getUser();
 
   if (!user) {
-    redirect('/login');
+    redirect('/login?from=/admin');
   }
 
   if (user.role !== 'admin') {
@@ -72,21 +68,21 @@ export default async function AdminLayout({
                 href="/admin/settings"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
-                <ShoppingCart className="h-4 w-4" />
+                <Settings className="h-4 w-4" />
                 Site Settings
               </Link>
               <Link
                 href="/admin/navigation"
-                className="flex items-center gap-3 rounded-lg bg-muted px-3 py-2 text-primary transition-all hover:text-primary"
+                className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
-                <Package className="h-4 w-4" />
+                <Navigation className="h-4 w-4" />
                 Navigation
               </Link>
               <Link
                 href="/admin/content"
                 className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
               >
-                <Users className="h-4 w-4" />
+                <FileText className="h-4 w-4" />
                 Content Blocks
               </Link>
             </nav>
@@ -95,11 +91,10 @@ export default async function AdminLayout({
       </div>
       <div className="flex flex-col">
         <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
-          {/* Header content can go here, e.g., mobile nav, user menu */}
           <div className="w-full flex-1">
-            {/* Add a search bar or other controls if needed */}
+            <h1 className="font-semibold text-lg">Admin Panel</h1>
           </div>
-          {/* User dropdown can go here */}
+          <span className="text-sm text-muted-foreground">Welcome, {user.name}</span>
         </header>
         <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
           {children}
