@@ -1,24 +1,86 @@
 import Image from 'next/image';
 import { Search, MoreHorizontal } from 'lucide-react';
-import { z } from 'zod';
 
-// Define a Zod schema for a single blog post to validate the parsed data
-const blogPostSchema = z.object({
-  image: z.string().nullable(),
-  imageAlt: z.string(),
-  imageWidth: z.number(),
-  imageHeight: z.number(),
-  title: z.string(),
-  excerpt: z.string(),
-  author: z.string(),
-  date: z.string(),
-  readTime: z.string(),
-});
+type BlogPost = {
+  image: string | null;
+  imageAlt: string;
+  imageWidth: number;
+  imageHeight: number;
+  title: string;
+  excerpt: string;
+  author: string;
+  date: string;
+  readTime: string;
+};
 
-// Define the type for an array of blog posts
-const blogPostsSchema = z.array(blogPostSchema);
-
-type BlogPost = z.infer<typeof blogPostSchema>;
+const blogPosts: BlogPost[] = [
+  {
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/063d45e6-a298-496e-822b-8d1be04b580e-govilkar-com/assets/images/234705a77b7b4aae825b096666ebbd41-8.webp?",
+    imageAlt: "An hourglass, symbolizing time.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "TIME IS OF THE ESSENCE",
+    excerpt: "Time is of the essence in some contracts and there are legal repercussions for breach of the time schedule.",
+    author: "Mihir Govilkar",
+    date: "Oct 14, 2021",
+    readTime: "6 min read"
+  },
+  {
+    image: null,
+    imageAlt: "A gavel, book, and scales of justice.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "Indian Judiciary: 'Settlement', Lawyers & Expectations",
+    excerpt: "This article discusses the unscrupulous practices followed by some lawyers by guaranteeing outcomes to their clients and their expectations.",
+    author: "Mihir Govilkar",
+    date: "Oct 5, 2021",
+    readTime: "4 min read"
+  },
+  {
+    image: null,
+    imageAlt: "A collection of social media app icons on a smartphone screen.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "The Evolution of Law with Technology",
+    excerpt: "It was in the year 1998, that I had gone on a family trip to Singapore. I remember, my elder brother searching desperately for a...",
+    author: "Mihir Govilkar",
+    date: "Sep 28, 2021",
+    readTime: "7 min read"
+  },
+  {
+    image: null,
+    imageAlt: "Two people holding hands in a supportive gesture.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "Mediation in our Culture & Traditions",
+    excerpt: "My journey in Mediation is as yet, short. But in my short journey, I have recognised the power that Mediation can have and it is...",
+    author: "Mihir Govilkar",
+    date: "Aug 31, 2021",
+    readTime: "17 min read"
+  },
+  {
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/063d45e6-a298-496e-822b-8d1be04b580e-govilkar-com/assets/images/234705a77b7b4aae825b096666ebbd41-9.webp?",
+    imageAlt: "A firm handshake between two business professionals.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "LEGAL VALIDITY OF THE ORAL AGREEMENT IN 'LAGAAN'.",
+    excerpt: "Today, I was watching the movie Lagaan which was released in the year 2001. The movie depicts events (fictional) that transpired in the...",
+    author: "Mihir Govilkar",
+    date: "Jul 14, 2021",
+    readTime: "11 min read"
+  },
+  {
+    image: "https://slelguoygbfzlpylpxfs.supabase.co/storage/v1/object/public/test-clones/063d45e6-a298-496e-822b-8d1be04b580e-govilkar-com/assets/images/0a1b91b965d01bc858fbf83a0916770f-14.png?",
+    imageAlt: "Promotional poster for the movie 'Baazigar'.",
+    imageWidth: 355,
+    imageHeight: 237,
+    title: "The Improbable 'Power of Attorney' in 'Baazigar'.",
+    excerpt: "A few days ago, I had written an article on the legal validity of the oral agreement in the movie 'Lagaan'. It was an interesting...",
+    author: "Mihir Govilkar",
+    date: "Jul 30, 2021",
+    readTime: "8 min read"
+  }
+];
 
 const BlogCard = ({ post }: { post: BlogPost }) => (
   <article>
@@ -63,50 +125,7 @@ const BlogCard = ({ post }: { post: BlogPost }) => (
   </article>
 );
 
-interface BlogGridProps {
-  content: string | null;
-}
-
-const BlogGrid = ({ content }: BlogGridProps) => {
-  let posts: BlogPost[] = [];
-  let parseError = false;
-
-  if (content) {
-    try {
-      const parsedData = JSON.parse(content);
-      const validationResult = blogPostsSchema.safeParse(parsedData);
-      if (validationResult.success) {
-        posts = validationResult.data;
-      } else {
-        console.error("Blog content validation error:", validationResult.error);
-        parseError = true;
-      }
-    } catch (error) {
-      console.error("Failed to parse blog content JSON:", error);
-      parseError = true;
-    }
-  }
-
-  if (parseError) {
-    return (
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p className="text-red-500">Error: El contenido del blog no es válido.</p>
-        </div>
-      </section>
-    );
-  }
-
-  if (posts.length === 0) {
-    return (
-      <section className="py-16">
-        <div className="max-w-5xl mx-auto px-4 text-center">
-          <p>No hay artículos en el blog todavía.</p>
-        </div>
-      </section>
-    );
-  }
-
+const BlogGrid = () => {
   return (
     <section
       className="py-16 bg-repeat"
@@ -126,7 +145,7 @@ const BlogGrid = ({ content }: BlogGridProps) => {
           </header>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {posts.map((post, index) => (
+            {blogPosts.map((post, index) => (
               <BlogCard key={index} post={post} />
             ))}
           </div>

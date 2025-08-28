@@ -5,7 +5,11 @@ interface MarkdownRendererProps {
 }
 
 const MarkdownRenderer = ({ markdown }: MarkdownRendererProps) => {
-  return <ReactMarkdown className="prose dark:prose-invert max-w-none">{markdown}</ReactMarkdown>;
+  return (
+    <div className="prose dark:prose-invert max-w-none">
+      <ReactMarkdown>{markdown}</ReactMarkdown>
+    </div>
+  );
 };
 
 export default MarkdownRenderer;
