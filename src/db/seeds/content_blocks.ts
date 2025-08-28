@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { contentBlocks } from '@/db/schema';
 
-export async function main() {
+async function main() {
     const sampleContentBlocks = [
         {
             blockName: 'footer_contact_info',

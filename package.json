@@ -6,9 +6,9 @@
         "dev": "next dev --turbopack",
         "build": "next build",
         "start": "next start",
-    "lint": "next lint",
-    "db:push": "drizzle-kit push",
-    "db:seed": "bun run src/db/seed.ts"
+        "lint": "next lint",
+        "db:push": "drizzle-kit push",
+    "db:seed": "bun run src/db/seeds/users.ts && bun run src/db/seeds/site_settings.ts && bun run src/db/seeds/navigation_items.ts && bun run src/db/seeds/content_blocks.ts"
     },
     "dependencies": {
         "@babel/parser": "^7.28.0",
@@ -81,6 +81,7 @@
         "react-hook-form": "^7.60.0",
         "react-icons": "^5.5.0",
         "react-intersection-observer": "^9.16.0",
+        "react-markdown": "^10.1.0",
         "react-resizable-panels": "^3.0.3",
         "react-responsive-masonry": "^2.7.1",
         "react-rough-notation": "^1.0.5",

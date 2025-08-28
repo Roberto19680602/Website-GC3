@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { siteSettings } from '@/db/schema';
 
-export async function main() {
+async function main() {
     const sampleSettings = [
         // Brand & Design Settings
         {

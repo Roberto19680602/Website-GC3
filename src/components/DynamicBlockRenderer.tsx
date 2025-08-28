@@ -1,4 +1,6 @@
-import BlogGrid from './sections/blog-grit'; // Note the filename typo
+import BlogGrid from './sections/blog-grid';
+import HtmlRenderer from './HtmlRenderer';
+import MarkdownRenderer from './MarkdownRenderer';
 import { contentBlocks } from '@/db/schema';
 
 // Define a type for the block prop, using the schema type
@@ -9,20 +11,31 @@ interface DynamicBlockRendererProps {
 }
 
 const DynamicBlockRenderer = ({ block }: DynamicBlockRendererProps) => {
+  if (!block.blockContent) {
+    return null;
+  }
+
   switch (block.blockType) {
     case 'blog-grid':
-      // In the future, we would pass block.blockContent to BlogGrid
-      // e.g., <BlogGrid content={JSON.parse(block.blockContent)} />
-      return <BlogGrid />;
+      return <BlogGrid content={block.blockContent} />;
 
-    // Add other cases here for other block types
-    // case 'hero-section':
-    //   return <HeroSection content={...} />;
+    case 'html':
+      return <HtmlRenderer html={block.blockContent} />;
+
+    case 'markdown':
+      return <MarkdownRenderer markdown={block.blockContent} />;
+
+    case 'text':
+      return <p>{block.blockContent}</p>;
 
     default:
-      // Render nothing or a placeholder for unknown block types
       console.warn(`Unknown block type: ${block.blockType}`);
-      return null;
+      return (
+        <div className="border-2 border-dashed border-red-500 p-4 my-4">
+          <p className="text-red-500 font-bold">Unknown Block Type: "{block.blockType}"</p>
+          <pre className="text-xs mt-2 bg-gray-100 p-2 rounded">{block.blockContent}</pre>
+        </div>
+      );
   }
 };
 

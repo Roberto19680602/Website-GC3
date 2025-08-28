@@ -1,7 +1,7 @@
 import { db } from '@/db';
 import { navigationItems } from '@/db/schema';
 
-export async function main() {
+async function main() {
     const sampleNavigationItems = [
         // Main Navigation Items
         {
