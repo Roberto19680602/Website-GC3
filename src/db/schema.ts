@@ -1,3 +1,4 @@
+import { relations } from 'drizzle-orm';
 import { sqliteTable, integer, text } from 'drizzle-orm/sqlite-core';
 
 export const users = sqliteTable('users', {
@@ -44,9 +45,20 @@ export const navigationItems = sqliteTable('navigation_items', {
   id: integer('id').primaryKey({ autoIncrement: true }),
   label: text('label').notNull(),
   href: text('href').notNull(),
-  parentId: integer('parent_id').references(() => navigationItems.id),
+  parentId: integer('parent_id'),
   orderIndex: integer('order_index').default(0),
   isActive: integer('is_active', { mode: 'boolean' }).default(true),
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
 });
+
+export const navigationItemsRelations = relations(navigationItems, ({ one, many }) => ({
+  parent: one(navigationItems, {
+    fields: [navigationItems.parentId],
+    references: [navigationItems.id],
+    relationName: 'parent',
+  }),
+  children: many(navigationItems, {
+    relationName: 'parent',
+  }),
+}));

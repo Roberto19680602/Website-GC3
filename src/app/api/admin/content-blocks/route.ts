@@ -37,8 +37,6 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'createdAt';
     const order = searchParams.get('order') || 'desc';
 
-    let query = db.select().from(contentBlocks);
-    
     const conditions = [];
 
     // Search functionality
@@ -57,23 +55,22 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(contentBlocks.isActive, isActive));
     }
 
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
+    const orderByColumn =
+      sort === 'blockName' ? contentBlocks.blockName :
+      sort === 'blockType' ? contentBlocks.blockType :
+      sort === 'updatedAt' ? contentBlocks.updatedAt :
+      contentBlocks.createdAt;
 
-    // Sorting
-    const orderBy = order === 'asc' ? asc : desc;
-    if (sort === 'blockName') {
-      query = query.orderBy(orderBy(contentBlocks.blockName));
-    } else if (sort === 'blockType') {
-      query = query.orderBy(orderBy(contentBlocks.blockType));
-    } else if (sort === 'updatedAt') {
-      query = query.orderBy(orderBy(contentBlocks.updatedAt));
-    } else {
-      query = query.orderBy(orderBy(contentBlocks.createdAt));
-    }
+    const orderByDirection = order === 'asc' ? asc : desc;
 
-    const results = await query.limit(limit).offset(offset);
+    const results = await db
+      .select()
+      .from(contentBlocks)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(orderByDirection(orderByColumn))
+      .limit(limit)
+      .offset(offset);
+
     return NextResponse.json(results);
 
   } catch (error) {
@@ -150,6 +147,12 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date().toISOString()
       })
       .returning();
+
+    if (!Array.isArray(newContentBlock) || newContentBlock.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to create or retrieve the new record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json(newContentBlock[0], { status: 201 });
 

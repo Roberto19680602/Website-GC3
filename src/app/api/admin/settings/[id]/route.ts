@@ -5,10 +5,10 @@ import { eq } from 'drizzle-orm';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json({
@@ -39,10 +39,10 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json({
@@ -96,6 +96,12 @@ export async function PUT(
       .where(eq(siteSettings.id, parseInt(id)))
       .returning();
 
+    if (!Array.isArray(updated) || updated.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to update or retrieve the updated record'
+      }, { status: 500 });
+    }
+
     return NextResponse.json(updated[0]);
   } catch (error) {
     console.error('PUT error:', error);
@@ -107,10 +113,10 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const id = params.id;
+    const { id } = await params;
 
     if (!id || isNaN(parseInt(id))) {
       return NextResponse.json({
@@ -134,6 +140,12 @@ export async function DELETE(
     const deleted = await db.delete(siteSettings)
       .where(eq(siteSettings.id, parseInt(id)))
       .returning();
+
+    if (!Array.isArray(deleted) || deleted.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to delete or retrieve the deleted record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Site setting deleted successfully',

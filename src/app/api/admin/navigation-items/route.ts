@@ -16,9 +16,6 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get('sort') || 'orderIndex';
     const order = searchParams.get('order') || 'asc';
 
-    // Build query
-    let query = db.select().from(navigationItems);
-    
     const conditions = [];
 
     // Search filter
@@ -49,31 +46,23 @@ export async function GET(request: NextRequest) {
       conditions.push(eq(navigationItems.isActive, isActive));
     }
 
-    // Apply conditions
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions));
-    }
-
-    // Apply sorting
+    // Determine sorting
     const sortField = sort === 'label' ? navigationItems.label : 
                      sort === 'href' ? navigationItems.href :
                      sort === 'createdAt' ? navigationItems.createdAt :
                      sort === 'updatedAt' ? navigationItems.updatedAt :
                      navigationItems.orderIndex;
 
-    if (order === 'desc') {
-      query = query.orderBy(desc(sortField));
-    } else {
-      query = query.orderBy(asc(sortField));
-    }
+    const orderDirection = order === 'desc' ? desc : asc;
 
-    // Default secondary sort by label if not sorting by label
-    if (sort !== 'label') {
-      query = query.orderBy(asc(navigationItems.label));
-    }
-
-    // Apply pagination
-    const results = await query.limit(limit).offset(offset);
+    // Build and execute query in a single chain
+    const results = await db
+      .select()
+      .from(navigationItems)
+      .where(conditions.length > 0 ? and(...conditions) : undefined)
+      .orderBy(orderDirection(sortField), asc(navigationItems.label))
+      .limit(limit)
+      .offset(offset);
 
     return NextResponse.json(results);
   } catch (error) {
@@ -160,6 +149,12 @@ export async function POST(request: NextRequest) {
     const newNavigationItem = await db.insert(navigationItems)
       .values(insertData)
       .returning();
+
+    if (!Array.isArray(newNavigationItem) || newNavigationItem.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to create or retrieve the new record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json(newNavigationItem[0], { status: 201 });
   } catch (error) {
@@ -305,6 +300,12 @@ export async function PUT(request: NextRequest) {
       .where(eq(navigationItems.id, navigationItemId))
       .returning();
 
+    if (!Array.isArray(updated) || updated.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to update or retrieve the updated record'
+      }, { status: 500 });
+    }
+
     return NextResponse.json(updated[0]);
   } catch (error) {
     console.error('PUT error:', error);
@@ -358,6 +359,12 @@ export async function DELETE(request: NextRequest) {
     const deleted = await db.delete(navigationItems)
       .where(eq(navigationItems.id, navigationItemId))
       .returning();
+
+    if (!Array.isArray(deleted) || deleted.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to delete or retrieve the deleted record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Navigation item deleted successfully',

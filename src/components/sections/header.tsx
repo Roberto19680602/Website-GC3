@@ -1,96 +1,87 @@
-"use client";
+import { db } from '@/db';
+import { navigationItems } from '@/db/schema';
+import { eq, asc } from 'drizzle-orm';
+import Link from 'next/link';
+import { Menu } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 
-import React from "react";
+// Data fetching function
+async function getNavItems() {
+  try {
+    const items = await db
+      .select()
+      .from(navigationItems)
+      .where(eq(navigationItems.isActive, true))
+      .orderBy(asc(navigationItems.orderIndex));
+    return items;
+  } catch (error) {
+    console.error("Failed to fetch navigation items:", error);
+    return []; // Return empty array on error
+  }
+}
 
-const Footer = () => {
+const Header = async () => {
+  const navItems = await getNavItems();
+
   return (
-    <footer className="bg-[#2A3440]">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
-        <div className="max-w-xl mx-auto">
-          <form className="flex flex-col items-center space-y-4">
-            <label htmlFor="name" className="sr-only">
-              Nombre
-            </label>
-            <input
-              id="name"
-              type="text"
-              placeholder="Nombre"
-              className="w-full bg-white border border-white rounded-none p-3 h-12 text-black placeholder:text-gray-500 focus:outline-none"
-            />
-            <label htmlFor="message" className="sr-only">
-              Mensaje
-            </label>
-            <textarea
-              id="message"
-              placeholder="Quiero unirme a la lista de correo."
-              rows={4}
-              className="w-full bg-white border border-white rounded-none p-3 text-black placeholder:text-gray-500 resize-none focus:outline-none"
-            />
-            <div className="flex items-center self-start pt-2 w-full">
-              <input
-                id="privacy-policy"
-                type="checkbox"
-                className="appearance-none h-5 w-5 border border-white bg-transparent shrink-0"
-              />
-              <label
-                htmlFor="privacy-policy"
-                className="ml-3 text-sm text-white cursor-pointer"
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <div className="container flex h-14 items-center">
+        <div className="mr-4 hidden md:flex">
+          <Link href="/" className="mr-6 flex items-center space-x-2">
+            {/* You can add a logo here */}
+            <span className="font-bold">GC3</span>
+          </Link>
+          <nav className="flex items-center space-x-6 text-sm font-medium">
+            {navItems.map((item) => (
+              <Link
+                key={item.id}
+                href={item.href}
+                className="transition-colors hover:text-foreground/80 text-foreground/60"
               >
-                Acepto la política de privacidad.
-              </label>
-            </div>
-            <button
-              type="submit"
-              className="text-white text-lg hover:underline py-4"
-            >
-              Suscribirse Ahora
-            </button>
-          </form>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
         </div>
 
-        <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 items-center text-white">
-          <div className="flex justify-center md:justify-start">
-            <div className="flex flex-col sm:flex-row gap-x-12 gap-y-2 text-center sm:text-left text-sm">
-              <div className="flex flex-col space-y-2">
-                <a href="#" className="hover:underline">
-                  No Vender Mi Información Personal
-                </a>
-                <a href="#" className="hover:underline">
-                  Política de Privacidad
-                </a>
-                <a href="#" className="hover:underline">
-                  Política de Precios
-                </a>
+        {/* Mobile Menu */}
+        <div className="flex flex-1 items-center justify-between space-x-2 md:hidden">
+           <Link href="/" className="flex items-center space-x-2">
+            <span className="font-bold">GC3</span>
+          </Link>
+          <Sheet>
+            <SheetTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <Menu className="h-5 w-5" />
+                <span className="sr-only">Toggle Menu</span>
+              </Button>
+            </SheetTrigger>
+            <SheetContent side="right" className="w-[300px] sm:w-[400px]">
+              <div className="flex flex-col space-y-4 mt-6">
+                {navItems.map((item) => (
+                  <Link
+                    key={item.id}
+                    href={item.href}
+                    className="text-lg font-medium"
+                  >
+                    {item.label}
+                  </Link>
+                ))}
               </div>
-              <div className="flex flex-col space-y-2">
-                <a href="#" className="hover:underline">
-                  Términos de Uso
-                </a>
-                <a href="#" className="hover:underline">
-                  Política de Cancelación/Reembolso
-                </a>
-              </div>
-            </div>
-          </div>
-          <div className="text-center">
-            <a
-              href="mailto:info@gc3consultoria.com"
-              className="text-xl font-bold hover:underline"
-            >
-              Contáctanos
-            </a>
-          </div>
-          <div className="text-center md:text-right">
-            <p className="text-sm">© 2024 por GC3 Consultoría</p>
-          </div>
+            </SheetContent>
+          </Sheet>
+        </div>
+
+        <div className="flex flex-1 items-center justify-end space-x-4">
+            {/* Auth buttons can go here */}
+             <Link href="/login">
+                <Button variant="ghost">Login</Button>
+             </Link>
         </div>
       </div>
-      <div
-        className="h-10 w-full"
-        style={{ backgroundColor: "var(--color-brand-primary)" }}
-      ></div>
-    </footer>
+    </header>
   );
 };
 
-export default Footer;
+export default Header;

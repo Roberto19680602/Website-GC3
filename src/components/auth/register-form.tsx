@@ -25,7 +25,7 @@ const registerSchema = z.object({
     .regex(/[a-z]/, { message: 'Password must contain at least one lowercase letter / La contraseña debe contener al menos una minúscula' })
     .regex(/[0-9]/, { message: 'Password must contain at least one number / La contraseña debe contener al menos un número' }),
   confirmPassword: z.string(),
-  role: z.enum(['admin', 'user']).optional().default('user'),
+  role: z.enum(['admin', 'user']).optional(),
   acceptTerms: z.boolean().refine(val => val === true, {
     message: 'You must accept the terms and conditions / Debe aceptar los términos y condiciones'
   })

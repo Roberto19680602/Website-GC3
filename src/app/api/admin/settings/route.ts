@@ -36,18 +36,13 @@ export async function GET(request: NextRequest) {
     const offset = parseInt(searchParams.get('offset') || '0');
     const search = searchParams.get('search');
 
-    let query = db.select().from(siteSettings);
-    
-    if (search) {
-      query = query.where(
-        or(
-          like(siteSettings.settingName, `%${search}%`),
-          like(siteSettings.category, `%${search}%`)
-        )
-      );
-    }
-
-    const results = await query
+    const results = await db
+      .select()
+      .from(siteSettings)
+      .where(search ? or(
+        like(siteSettings.settingName, `%${search}%`),
+        like(siteSettings.category, `%${search}%`)
+      ) : undefined)
       .orderBy(desc(siteSettings.createdAt))
       .limit(limit)
       .offset(offset);
@@ -120,6 +115,12 @@ export async function POST(request: NextRequest) {
         updatedAt: new Date().toISOString()
       })
       .returning();
+
+    if (!Array.isArray(newSetting) || newSetting.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to create or retrieve the new record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json(newSetting[0], { status: 201 });
 
@@ -202,6 +203,12 @@ export async function PUT(request: NextRequest) {
       .where(eq(siteSettings.id, parseInt(id)))
       .returning();
 
+    if (!Array.isArray(updated) || updated.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to update or retrieve the updated record'
+      }, { status: 500 });
+    }
+
     return NextResponse.json(updated[0]);
 
   } catch (error) {
@@ -237,6 +244,12 @@ export async function DELETE(request: NextRequest) {
     const deleted = await db.delete(siteSettings)
       .where(eq(siteSettings.id, parseInt(id)))
       .returning();
+
+    if (!Array.isArray(deleted) || deleted.length === 0) {
+      return NextResponse.json({
+        error: 'Failed to delete or retrieve the deleted record'
+      }, { status: 500 });
+    }
 
     return NextResponse.json({
       message: 'Setting deleted successfully',
