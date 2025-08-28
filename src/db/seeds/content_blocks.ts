@@ -361,6 +361,41 @@ Nuestro despacho mantiene las siguientes certificaciones:
 
     await db.insert(contentBlocks).values(sampleContentBlocks);
     
+    const blogPostsForSeed = [
+      {
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=400&h=250&fit=crop",
+        imageAlt: "Digital transformation strategy",
+        imageWidth: 400,
+        imageHeight: 250,
+        title: "Estrategias de Transformación Digital para Empresas Tradicionales",
+        excerpt: "Cómo las empresas establecidas pueden adaptarse exitosamente a la era digital sin perder su identidad corporativa.",
+        author: "María González",
+        date: "15 de Enero, 2024",
+        readTime: "8 min"
+      },
+      {
+        image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=250&fit=crop",
+        imageAlt: "Effective leadership",
+        imageWidth: 400,
+        imageHeight: 250,
+        title: "Liderazgo Efectivo en Tiempos de Crisis: Lecciones Aprendidas",
+        excerpt: "Análisis de las mejores prácticas de liderazgo que han demostrado ser efectivas durante períodos de incertidumbre.",
+        author: "Carlos Rodríguez",
+        date: "12 de Enero, 2024",
+        readTime: "6 min"
+      }
+    ];
+
+    await db.insert(contentBlocks).values({
+        blockName: 'blog_page_grid',
+        blockContent: JSON.stringify(blogPostsForSeed),
+        blockType: 'blog-grid',
+        pageLocation: 'blog-page',
+        isActive: true,
+        createdAt: new Date('2024-01-20').toISOString(),
+        updatedAt: new Date('2024-01-20').toISOString(),
+    });
+
     console.log('✅ Content blocks seeder completed successfully');
 }
 
